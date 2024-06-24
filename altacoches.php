@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrar Coche</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container">
+    <h3>Registrar Coche</h3>
+    <form action="altaCoche.php" method="POST">
+        <div class="input-field">
+            <i class="material-icons prefix">directions_car</i>
+            <input id="claveM" type="text" name="claveM" value="<?php echo isset($_GET['claveM']) ? htmlspecialchars($_GET['claveM']) : ''; ?>" readonly>
+            <label for="claveM">Clave del Modelo</label>
+        </div>
+        <div class="input-field">
+            <i class="material-icons prefix">build</i>
+            <input id="motor" type="text" name="motor" required>
+            <label for="motor">Motor</label>
+        </div>
+        <div class="input-field">
+            <i class="material-icons prefix">settings</i>
+            <input id="suspension" type="text" name="suspension" required>
+            <label for="suspension">Suspensión</label>
+        </div>
+        <div class="input-field">
+            <i class="material-icons prefix">style</i>
+            <input id="carroceria" type="text" name="carroceria" required>
+            <label for="carroceria">Carrocería</label>
+        </div>
+        <div class="input-field">
+            <i class="material-icons prefix">attach_money</i>
+            <input id="regalias" type="text" name="regalias" required>
+            <label for="regalias">Regalías</label>
+        </div>
+        <button type="submit" class="btn waves-effect waves-light">Registrar</button>
+    </form>
+</div>
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+</body>
+</html>

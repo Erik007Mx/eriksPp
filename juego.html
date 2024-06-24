@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Juego de Carreras</title>
+  <style>
+    body {
+      background-image: url('carretera.png');
+      background-size: cover;
+      background-position: center;
+      margin: 0;
+      overflow: hidden;
+    }
+
+    canvas {
+      display: block;
+      margin: 0 auto;
+      background-color: transparent;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="gameCanvas" width="800" height="600"></canvas>
+  <script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+
+    const carImg = new Image();
+    carImg.src = 'cocheOE.png';
+    const obstacleImg = new Image();
+    obstacleImg.src = 'obs.png';
+
+    let carX = canvas.width / 2 - 25;
+    const carY = canvas.height - 100;
+    const carWidth = 50;
+    const carHeight = 100;
+
+    let obstacles = []; // Array para almacenar los obstáculos
+    const obstacleWidth = 50;
+    const obstacleHeight = 50;
+    let obstacleSpeed = 2;
+
+    let score = 0;
+    let level = 1;
+
+    const carMoveSound = new Audio('rizz.mp3');
+    const carCollisionSound = new Audio('crack.mp3');
+    const backgroundMusic = new Audio('music.mp3');
+    backgroundMusic.loop = true;
+    backgroundMusic.volume = 0.7;
+
+    function playBackgroundMusic() {
+      try {
+        backgroundMusic.play();
+      } catch (error) {
+        console.log("Error al reproducir la música de fondo:", error);
+      }
+    }
+
+    playBackgroundMusic();
+
+    function drawCar() {
+      ctx.drawImage(carImg, carX, carY, carWidth, carHeight);
+    }
+
+    function drawObstacles() {
+      obstacles.forEach(obstacle => {
+        ctx.drawImage(obstacleImg, obstacle.x, obstacle.y, obstacleWidth, obstacleHeight);
+      });
+    }
+
+    function drawScore() {
+      ctx.font = '24px Arial';
+      ctx.fillStyle = '#000';
+      ctx.fillText(`Puntaje: ${score}`, 10, 30);
+    }
+
+    function drawLevel() {
+      ctx.font = '24px Arial';
+      ctx.fillStyle = '#000';
+      ctx.fillText(`Nivel: ${level}`, 10, 60);
+    }
+
+    function moveCar(event) {
+      const key = event.key;
+      if (key === 'ArrowLeft' && carX > 0) {
+        carX -= 10;
+        carMoveSound.play();
+      } else if (key === 'ArrowRight' && carX < canvas.width - carWidth) {
+        carX += 10;
+        carMoveSound.play();
+      }
+    }
+
+    function checkCollision() {
+      obstacles.forEach((obstacle, index) => {
+        if (carX < obstacle.x + obstacleWidth &&
+          carX + carWidth > obstacle.x &&
+          carY < obstacle.y + obstacleHeight &&
+          carY + carHeight > obstacle.y) {
+          // Collision detected
+          carCollisionSound.play();
+          score -= 10;
+          if (score < 0) score = 0;
+          obstacles.splice(index, 1); // Eliminar el obstáculo colisionado del array
+        }
+      });
+    }
+
+    function increaseObstacleSpeed() {
+      obstacleSpeed += 0.2;
+    }
+
+    function generateObstacle() {
+      const newObstacle = {
+        x: Math.random() * (canvas.width - obstacleWidth),
+        y: -100
+      };
+      obstacles.push(newObstacle); // Agregar el nuevo obstáculo al array
+    }
+
+    function gameLoop() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      drawCar();
+      drawObstacles();
+      drawScore();
+      drawLevel();
+
+      obstacles.forEach(obstacle => {
+        obstacle.y += obstacleSpeed; // Mover los obstáculos hacia abajo
+      });
+
+      if (obstacles.length === 0 || obstacles[obstacles.length - 1].y > 100) {
+        generateObstacle();
+        score += 10;
+        if (score % 100 === 0) {
+          level++;
+          increaseObstacleSpeed();
+          if (level === 2 || level === 4) { // Nivel 2 y nivel 4: generan un obstáculo adicional y aumentan la velocidad
+            generateObstacle();
+            obstacleSpeed += 0.2;
+          } else if (level === 3 || level === 5) { // Nivel 3 y nivel 5: generan dos obstáculos adicionales y aumentan la velocidad
+            generateObstacle();
+            generateObstacle();
+            obstacleSpeed += 0.4;
+          } else if (level === 6) { // Nivel 6: mostrar mensaje de victoria y reiniciar juego
+            alert("¡Felicidades! Has superado todos los niveles.");
+            level = 1;
+            score = 0;
+            obstacleSpeed = 2;
+            obstacles = [];
+          }
+        }
+      }
+
+      checkCollision();
+
+      requestAnimationFrame(gameLoop);
+    }
+
+    document.addEventListener('keydown', moveCar);
+
+    gameLoop();
+  </script>
+</body>
+</html>
